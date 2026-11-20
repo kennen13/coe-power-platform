@@ -1,0 +1,14 @@
+[
+  {
+    "name": "AdventureWorksDW",
+    "path": "/Tables",
+    "target": {
+      "type": "OneLake",
+      "oneLake": {
+        "path": "Tables/AdventureWorksDW",
+        "itemId": "a487401a-98cb-41a7-9254-2ae9428932dd",
+        "workspaceId": "99436883-0c7f-47ae-992c-d96f4f078295"
+      }
+    }
+  }
+]
