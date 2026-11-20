@@ -1,0 +1,73 @@
+/// **What this table is**
+/// 
+/// One row per shareholder, with their age band, city and the year they joined. Built from `silver.shareholders`.
+/// 
+/// It also has one row `UNKNOWN` ("Unknown shareholder"), for the contributions received without a shareholder.
+/// The age band is calculated on the day of the dbt run. Fictional data.
+table dim_shareholder
+	lineageTag: 8052a80c-421f-425f-8465-b398460007fe
+
+	/// Business key of the shareholder, or UNKNOWN. Key of the table.
+	column shareholder_id
+		dataType: string
+		lineageTag: 4bc13e67-60c4-4c7b-9e96-c1578183e400
+		summarizeBy: none
+		sourceColumn: shareholder_id
+
+	/// First and last name (fictional).
+	column shareholder_name
+		dataType: string
+		lineageTag: c9d20ca2-85d5-4707-b7db-12985b332a97
+		summarizeBy: none
+		sourceColumn: shareholder_name
+
+	/// Year of birth.
+	column birth_year
+		dataType: int64
+		lineageTag: 2bfd0169-5350-4ad8-b76c-368057a3976c
+		summarizeBy: none
+		sourceColumn: birth_year
+
+	/// Age group on the day of the dbt run: Under 35, 35 to 49, 50 to 64, 65 and over.
+	column age_band
+		dataType: string
+		lineageTag: 3a2a975f-b549-491d-bede-fe198fcb5d5b
+		summarizeBy: none
+		sourceColumn: age_band
+
+	/// City of residence.
+	column city
+		dataType: string
+		lineageTag: a48b5336-c186-4740-9e94-67c0250c76aa
+		summarizeBy: none
+		sourceColumn: city
+
+	/// Province of residence.
+	column province
+		dataType: string
+		lineageTag: 794ec0ef-0829-4d2d-86b8-86edda6a9849
+		summarizeBy: none
+		sourceColumn: province
+
+	/// Date of the first share purchase.
+	column member_since
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 17de9254-ed4a-46b3-843c-6ce91eb582eb
+		summarizeBy: none
+		sourceColumn: member_since
+
+	/// Year of the first share purchase.
+	column member_since_year
+		dataType: int64
+		lineageTag: de16784a-180c-4030-9673-1f97986f75a2
+		summarizeBy: none
+		sourceColumn: member_since_year
+
+	partition dim_shareholder = entity
+		mode: directLake
+		source
+			entityName: dim_shareholder
+			schemaName: gold
+			expressionSource: DatabaseQuery
+

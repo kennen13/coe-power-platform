@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "rpt_fondaction_contributions_copy"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "1d1fd608-a57d-4425-83d9-9c579a199d70"
+  }
+}

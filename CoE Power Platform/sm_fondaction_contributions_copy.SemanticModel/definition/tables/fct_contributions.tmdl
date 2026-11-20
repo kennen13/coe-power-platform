@@ -1,0 +1,141 @@
+/// **What this table is**
+/// 
+/// The fact table of the reporting model: one row per shareholder contribution, with the amount, and the keys that link
+/// it to its date, shareholder, employer and channel. It is the table Power BI sums and counts. Fictional data.
+/// 
+/// **How it is built** (recalculated from the silver tables at every dbt run)
+/// 
+/// 1. **Takes every contribution** of `silver.contributions`, the suspicious ones included.
+/// 2. **Links each contribution to its dimensions**: the day of the contribution (`date_key`, for example 20260115 for
+///    January 15, 2026), the shareholder, the employer and the channel.
+/// 3. **Never leaves a link empty**, so Power BI never shows a blank: a contribution without a shareholder points to
+///    `UNKNOWN` ("Unknown shareholder"), one without employer to `NONE` ("No employer"), and one with a channel that is
+///    not official, such as a cheque, to `OTHER`. The channel as received is kept in `channel_as_received`.
+/// 4. **Lists the data quality issues** of each contribution in `data_quality_issues` (for example "Missing shareholder;
+///    Negative or zero amount"), and sets `has_data_quality_issue` to true when there is at least one. They are the same
+///    checks as the data quality rules, so a report can show or filter the contributions to review.
+/// 
+/// **Good to know**
+/// 
+/// - Contributions with issues are **kept, not removed**: totals include them unless a report filters them out.
+/// - "Date in the future" is checked on the day of the dbt run.
+table fct_contributions
+	lineageTag: f5f66dac-50cb-489d-82c4-2f04ed213586
+
+	measure 'Total contributions' = SUM ( fct_contributions[amount_cad] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: a93159c8-f201-454a-b0f9-cd420f15cd05
+
+	measure 'Number of contributions' = COUNTROWS ( fct_contributions )
+		formatString: #,0
+		lineageTag: 277795a1-6c59-42eb-8201-19923f13c4d9
+
+	measure 'Average contribution' = DIVIDE ( [Total contributions], [Number of contributions] )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 64385c03-5210-4291-831c-f8ab22bba137
+
+	measure 'Contributing shareholders' = CALCULATE ( DISTINCTCOUNT ( fct_contributions[shareholder_id] ), fct_contributions[shareholder_id] <> "UNKNOWN" )
+		formatString: #,0
+		lineageTag: b9d5a290-6e15-4cf5-a78a-cd482caa378c
+
+	measure 'RRSP share' = DIVIDE ( CALCULATE ( [Total contributions], fct_contributions[account_type] = "RRSP" ), [Total contributions] )
+		formatString: 0.0%
+		lineageTag: 716dd6a2-0df6-47c4-8fd7-b6d06c28d443
+
+	measure 'Contributions to review' = CALCULATE ( [Number of contributions], fct_contributions[has_data_quality_issue] = TRUE () )
+		formatString: #,0
+		lineageTag: 940495e9-0c5f-4975-841f-551476ae06ce
+
+	measure 'Share to review' = DIVIDE ( [Contributions to review], [Number of contributions] )
+		formatString: 0.0%
+		lineageTag: 48856483-5da8-4eb2-a1c1-fdfd86ec45ea
+
+	/// Business key of the contribution.
+	column contribution_id
+		dataType: string
+		lineageTag: 6dded21e-de56-4c49-8f8d-ec421de358b7
+		summarizeBy: none
+		sourceColumn: contribution_id
+
+	/// Day of the contribution, as a number YYYYMMDD. Links to dim_date.
+	column date_key
+		dataType: int64
+		isHidden
+		lineageTag: 7f17794d-9c6e-4fe9-9651-e60558bb4544
+		summarizeBy: none
+		sourceColumn: date_key
+
+	/// Shareholder who made the contribution, or UNKNOWN. Links to dim_shareholder.
+	column shareholder_id
+		dataType: string
+		isHidden
+		lineageTag: 72333b47-b084-4182-9375-fade522e626c
+		summarizeBy: none
+		sourceColumn: shareholder_id
+
+	/// Employer of a payroll deduction, or NONE. Links to dim_employer.
+	column employer_id
+		dataType: string
+		isHidden
+		lineageTag: 13d4ade2-fada-4952-b388-b4adc620d2f4
+		summarizeBy: none
+		sourceColumn: employer_id
+
+	/// Official channel of the contribution, or OTHER. Links to dim_contribution_channel.
+	column channel_code
+		dataType: string
+		isHidden
+		lineageTag: 48391f98-af1b-4167-a1d6-219f478c14ba
+		summarizeBy: none
+		sourceColumn: channel_code
+
+	/// Channel of the contribution as received, after standardization in silver (for example CHEQUE).
+	column channel_as_received
+		dataType: string
+		lineageTag: aa409508-1ad8-46b8-b755-034d3fad342a
+		summarizeBy: none
+		sourceColumn: channel_as_received
+
+	/// RRSP or NON_RRSP.
+	column account_type
+		dataType: string
+		lineageTag: 145c4e8c-079f-4072-a75a-9009b7e3224f
+		summarizeBy: none
+		sourceColumn: account_type
+
+	/// Tax year the contribution is claimed for.
+	column tax_year
+		dataType: int64
+		lineageTag: fa86e5dc-5ede-44d2-b127-94fbdfa899ae
+		summarizeBy: none
+		sourceColumn: tax_year
+
+	/// Amount of the contribution, in Canadian dollars.
+	column amount_cad
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 8b5e5d59-8ffe-4fab-b218-c28a01b08746
+		summarizeBy: sum
+		sourceColumn: amount_cad
+
+	/// The data quality issues of the contribution, separated by semicolons; empty when there is none.
+	column data_quality_issues
+		dataType: string
+		lineageTag: ef981365-3a49-4b5b-90a6-38735d323632
+		summarizeBy: none
+		sourceColumn: data_quality_issues
+
+	/// True when the contribution has at least one data quality issue.
+	column has_data_quality_issue
+		dataType: boolean
+		lineageTag: 9e42d0da-565c-4343-a96b-03e826c2cc9f
+		summarizeBy: none
+		sourceColumn: has_data_quality_issue
+
+	partition fct_contributions = entity
+		mode: directLake
+		source
+			entityName: fct_contributions
+			schemaName: gold
+			expressionSource: DatabaseQuery
+

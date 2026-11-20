@@ -1,0 +1,44 @@
+/// **What this table is**
+/// 
+/// One row per employer that offers payroll deductions, with its industry and city. Built from `silver.employers`.
+/// 
+/// It also has one row `NONE` ("No employer (not a payroll deduction)"), for the lump sums and pre-authorized debits,
+/// which do not go through an employer. Fictional data.
+table dim_employer
+	lineageTag: 2245d934-8822-49ae-b957-4d634fb40122
+
+	/// Business key of the employer, or NONE. Key of the table.
+	column employer_id
+		dataType: string
+		lineageTag: 93a714f8-0481-4806-81f0-e4cffd38cc99
+		summarizeBy: none
+		sourceColumn: employer_id
+
+	/// Name of the employer (fictional).
+	column employer_name
+		dataType: string
+		lineageTag: 1e4ecbd8-00aa-4d93-a809-fb6df188dd91
+		summarizeBy: none
+		sourceColumn: employer_name
+
+	/// Industry of the employer.
+	column industry
+		dataType: string
+		lineageTag: 8226300c-dca3-4ac8-a829-9d8c09ad1522
+		summarizeBy: none
+		sourceColumn: industry
+
+	/// City of the employer's main office.
+	column city
+		dataType: string
+		lineageTag: f4fa9427-8e1c-4fd4-a6b7-5eb8442f0543
+		summarizeBy: none
+		sourceColumn: city
+
+	partition dim_employer = entity
+		mode: directLake
+		source
+			entityName: dim_employer
+			schemaName: gold
+			expressionSource: DatabaseQuery
+

@@ -1,0 +1,14 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+ref table fct_contributions
+ref table dim_date
+ref table dim_shareholder
+ref table dim_employer
+ref table dim_contribution_channel
+

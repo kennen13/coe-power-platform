@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "sm_fondaction_contributions_copy"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "bea87a85-f756-43ea-9ba6-f6ba97b98e7f"
+  }
+}

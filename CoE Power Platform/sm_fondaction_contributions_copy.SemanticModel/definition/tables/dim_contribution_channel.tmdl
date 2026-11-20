@@ -1,0 +1,45 @@
+/// **What this table is**
+/// 
+/// The ways a shareholder can contribute: payroll deduction, lump sum and pre-authorized debit, with a description of
+/// each. Built from the reference list `ref_contribution_channels`, maintained by hand in the repo.
+/// 
+/// It also has one row `OTHER` ("Other (not an official channel)"), for the contributions received through a channel
+/// that is not on the list, such as a cheque.
+table dim_contribution_channel
+	lineageTag: 58d18ed1-186e-4d29-80ad-e7dd1e2992de
+
+	/// Code of the channel, or OTHER. Key of the table.
+	column channel_code
+		dataType: string
+		lineageTag: e70912ca-5774-45e1-a004-c4b9dddfad74
+		summarizeBy: none
+		sourceColumn: channel_code
+
+	/// Name of the channel, for reports.
+	column channel_name
+		dataType: string
+		lineageTag: 13768395-ab96-4165-bded-2d633ecff2c3
+		summarizeBy: none
+		sourceColumn: channel_name
+
+	/// What the channel means, in plain language.
+	column channel_description
+		dataType: string
+		lineageTag: 2f2f07a1-595a-43db-8f34-bf21eb9e1459
+		summarizeBy: none
+		sourceColumn: channel_description
+
+	/// True for the official channels, false for OTHER.
+	column is_official
+		dataType: boolean
+		lineageTag: eb8da02b-848f-4354-a868-568ea5e4e296
+		summarizeBy: none
+		sourceColumn: is_official
+
+	partition dim_contribution_channel = entity
+		mode: directLake
+		source
+			entityName: dim_contribution_channel
+			schemaName: gold
+			expressionSource: DatabaseQuery
+

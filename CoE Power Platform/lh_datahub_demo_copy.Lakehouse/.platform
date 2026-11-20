@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Lakehouse",
+    "displayName": "lh_datahub_demo_copy",
+    "description": "Copy of lh_datahub_demo (Fondaction demo), built by dbt."
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "b629485c-c4c9-46d5-a3dd-42702374be57"
+  }
+}

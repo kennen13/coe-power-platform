@@ -1,0 +1,119 @@
+/// **What this table is**
+/// 
+/// The calendar of the reporting model: one row per day from January 1, 2025 to December 31, 2027, with the year,
+/// quarter, month and day names used to group and sort in Power BI.
+/// 
+/// `is_rrsp_deadline_period` is true for the first 60 days of each year: contributions made in that period can be
+/// claimed for the previous tax year.
+table dim_date
+	lineageTag: 07b243f6-9c2b-4784-853d-e2ba03cb41b3
+	dataCategory: Time
+
+	/// The day as a number YYYYMMDD, for example 20260115. Key of the table.
+	column date_key
+		dataType: int64
+		isHidden
+		lineageTag: cafe225e-8e95-4b8f-828d-e718f6520a22
+		summarizeBy: none
+		sourceColumn: date_key
+
+	/// The day, as a date.
+	column calendar_date
+		dataType: dateTime
+		isKey
+		formatString: yyyy-mm-dd
+		lineageTag: 9e58ca2a-cb8b-40b8-92af-62d2ead4e156
+		summarizeBy: none
+		sourceColumn: calendar_date
+
+	/// Year, for example 2026.
+	column calendar_year
+		dataType: int64
+		lineageTag: b71f8b38-3031-4a54-9ee2-f55ab9fdc79e
+		summarizeBy: none
+		sourceColumn: calendar_year
+
+	/// Quarter, from 1 to 4.
+	column quarter_number
+		dataType: int64
+		isHidden
+		lineageTag: 92eb5167-db91-4517-877c-bf345b77db2c
+		summarizeBy: none
+		sourceColumn: quarter_number
+
+	/// Quarter, from Q1 to Q4.
+	column quarter_name
+		dataType: string
+		lineageTag: 8822cf95-b6ba-429e-9995-1a3dd38c10ed
+		summarizeBy: none
+		sourceColumn: quarter_name
+		sortByColumn: quarter_number
+
+	/// Month, from 1 to 12. Use it to sort the month names.
+	column month_number
+		dataType: int64
+		isHidden
+		lineageTag: 7a0f7143-ae1b-4360-b809-a55b75e7e64c
+		summarizeBy: none
+		sourceColumn: month_number
+
+	/// Month name, for example January.
+	column month_name
+		dataType: string
+		lineageTag: 2eeeaf2a-7a21-45f1-8079-2437bdf19ac9
+		summarizeBy: none
+		sourceColumn: month_name
+		sortByColumn: month_number
+
+	/// Short month name, for example Jan.
+	column month_short_name
+		dataType: string
+		lineageTag: 37324199-31f1-4541-8928-367902f259cc
+		summarizeBy: none
+		sourceColumn: month_short_name
+		sortByColumn: month_number
+
+	/// Year and month as a number YYYYMM. Use it to sort year_month.
+	column year_month_number
+		dataType: int64
+		isHidden
+		lineageTag: ec8e148b-5f88-4a2c-a9f1-e05fda13d460
+		summarizeBy: none
+		sourceColumn: year_month_number
+
+	/// Year and month, for example 2026-01.
+	column year_month
+		dataType: string
+		lineageTag: 3e157735-424b-49a2-ac0a-8f29141310aa
+		summarizeBy: none
+		sourceColumn: year_month
+		sortByColumn: year_month_number
+
+	/// Day of the month, from 1 to 31.
+	column day_of_month
+		dataType: int64
+		lineageTag: 532ee710-d24a-4e29-859d-3e369a448988
+		summarizeBy: none
+		sourceColumn: day_of_month
+
+	/// Day of the week, for example Monday.
+	column day_name
+		dataType: string
+		lineageTag: b8f92c56-990c-41d2-8e43-bceeeacbf39c
+		summarizeBy: none
+		sourceColumn: day_name
+
+	/// True for the first 60 days of the year, when contributions can count for the previous tax year.
+	column is_rrsp_deadline_period
+		dataType: boolean
+		lineageTag: 882b1670-a6f8-48b5-bff5-54d4211dc0af
+		summarizeBy: none
+		sourceColumn: is_rrsp_deadline_period
+
+	partition dim_date = entity
+		mode: directLake
+		source
+			entityName: dim_date
+			schemaName: gold
+			expressionSource: DatabaseQuery
+

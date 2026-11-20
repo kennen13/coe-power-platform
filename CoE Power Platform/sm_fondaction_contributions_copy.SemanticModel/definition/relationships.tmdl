@@ -1,0 +1,16 @@
+relationship 0b4590e2-07e4-42ea-9041-cbe211b80ada
+	fromColumn: fct_contributions.date_key
+	toColumn: dim_date.date_key
+
+relationship 33e49d8f-0eed-4a33-99cb-e2ac10b84eee
+	fromColumn: fct_contributions.shareholder_id
+	toColumn: dim_shareholder.shareholder_id
+
+relationship d90622e4-fa09-4751-8b0b-37fe34a17a31
+	fromColumn: fct_contributions.employer_id
+	toColumn: dim_employer.employer_id
+
+relationship bb3c1bfb-f7bf-4446-bbfd-5331d327ceb4
+	fromColumn: fct_contributions.channel_code
+	toColumn: dim_contribution_channel.channel_code
+
